@@ -9,5 +9,5 @@ let cardnumber = prompt("Which card will you pick? ");
 
 //console.log(greeting);
 
-console.log("I know what card you are thinking of!"+ cardsuit)
+console.log("I know what card you are thinking of! "+ cardsuit + cardnumber)
 
