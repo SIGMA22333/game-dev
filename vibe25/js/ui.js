@@ -1788,23 +1788,8 @@ class UI {
                             }, 20);
                         }
                     } else {
-                        // Decrease lives
-                        lives--;
-                        livesHearts[lives].textContent = '💔';
-                        
-                        if (lives <= 0) {
-                            // Game over - return to main menu
-                            if (gameLoop) {
-                                cancelAnimationFrame(gameLoop);
-                                gameLoop = null;
-                            }
-                            roomContainer.remove();
-                            this.container.style.display = 'flex';
-                        } else {
-                            // Reset player and vampires
-                            resetPlayer();
-                            resetVampires();
-                        }
+                        // Take damage from vampire
+                        this.takeDamage(20);
                     }
                 }
             });
@@ -1818,6 +1803,44 @@ class UI {
             gameLoop = requestAnimationFrame(movePlayer);
         };
         gameLoop = requestAnimationFrame(movePlayer);
+    }
+
+    takeDamage(amount) {
+        // Create damage effect
+        const damageEffect = document.createElement('div');
+        damageEffect.style.position = 'absolute';
+        damageEffect.style.left = `${playerX}px`;
+        damageEffect.style.top = `${playerY - 30}px`;
+        damageEffect.textContent = `-${amount}`;
+        damageEffect.style.color = '#c41e3a';
+        damageEffect.style.fontFamily = '"Playfair Display", serif';
+        damageEffect.style.fontSize = '20px';
+        damageEffect.style.textShadow = '2px 2px 4px rgba(0,0,0,0.5)';
+        damageEffect.style.zIndex = '1002';
+        gameWorld.appendChild(damageEffect);
+        
+        // Float up and fade out
+        let y = playerY - 30;
+        let opacity = 1;
+        const floatInterval = setInterval(() => {
+            y -= 1;
+            opacity -= 0.02;
+            damageEffect.style.top = `${y}px`;
+            damageEffect.style.opacity = opacity;
+            if (opacity <= 0) {
+                clearInterval(floatInterval);
+                damageEffect.remove();
+            }
+        }, 20);
+
+        // Make player temporarily invulnerable
+        isInvulnerable = true;
+        player.style.opacity = '0.5';
+        if (invulnerabilityTimer) clearTimeout(invulnerabilityTimer);
+        invulnerabilityTimer = setTimeout(() => {
+            isInvulnerable = false;
+            player.style.opacity = '1';
+        }, 1000);
     }
 
     showSettings() {
